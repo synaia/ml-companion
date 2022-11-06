@@ -3,7 +3,7 @@ from matplotlib.colors import ListedColormap
 import matplotlib.pyplot as plt
 
 
-def plot_decision_regions(X, y, classifier, resolution=0.02):
+def plot_decision_regions(X, y, classifier, test_idx=None, resolution=0.02):
     # setup marker generator and color map
     markers = ('o', 's', '^', 'v', '<')
     colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
@@ -29,3 +29,12 @@ def plot_decision_regions(X, y, classifier, resolution=0.02):
                     marker=markers[idx],
                     label=f'Class {cl}',
                     edgecolors='black')
+
+    # highlight test examples
+    if test_idx:
+        # plot all examples
+        X_test, y_test = X[test_idx, :], y[test_idx]
+        plt.scatter(X_test[:, 0], X_test[:, 1],
+                    c='none', edgecolors='black', alpha=1.0,
+                    linewidths=1, marker='o',
+                    s=100, label='Test set')
