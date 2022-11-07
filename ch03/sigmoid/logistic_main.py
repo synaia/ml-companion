@@ -1,6 +1,7 @@
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import Perceptron
 from sklearn.metrics import accuracy_score
 import numpy as np
@@ -30,4 +31,40 @@ plt.xlabel('Sepal length [standarized]')
 plt.ylabel('Petal length [standarized]')
 plt.legend(loc='upper left')
 plt.tight_layout()
+# plt.show()
+
+
+lr = LogisticRegression(C=100., solver='lbfgs', multi_class='ovr')
+lr.fit(X_train_std, y_train)
+X_combined_std = np.vstack((X_train_std, X_test_std))
+y_combined = np.hstack((y_train, y_test))
+plot_decision_regions(X=X_combined_std,
+                      y=y_combined,
+                      classifier=lr,
+                      test_idx=range(105, 150))
+plt.xlabel('Sepal length [standarized]')
+plt.ylabel('Petal length [standarized]')
+plt.legend(loc='upper left')
+plt.tight_layout()
+# plt.show()
+
+pr = lr.predict_proba(X_test_std[:3, :])
+print(pr)
+
+# The Inverse Regularization Parameter (C)
+weights, params = [], []
+for c in np.arange(-5, 5):
+    inverse_reg = 10.0**c
+    lr = LogisticRegression(C=inverse_reg, multi_class='ovr')
+    lr.fit(X_train_std, y_train)
+    weights.append(lr.coef_[1])
+    params.append(inverse_reg)
+weights = np.array(weights)
+plt.clf()
+plt.plot(params, weights[:, 0], label='Petal length')
+plt.plot(params, weights[:, 1], label='Petal width', linestyle='--')
+plt.ylabel('weight coeffiencient')
+plt.xlabel('C')
+plt.legend(loc='upper left')
+plt.xscale('log')
 plt.show()
