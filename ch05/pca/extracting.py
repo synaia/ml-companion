@@ -38,4 +38,24 @@ plt.xlabel('PC 1')
 plt.ylabel('PC 2')
 plt.legend(loc='lower left')
 plt.tight_layout()
+# plt.show()
+
+columnslabel = ['Alcohol',
+                       'Malic acid', 'Ash',
+                       'Alcalinity od ash', 'Magnesium',
+                       'Total phenols', 'Flavanoids',
+                       'Nonflavanoid phenols',
+                       'Proanthocyamins',
+                       'Color intensity', 'Hue',
+                       'OD280/OD315 of diluted wines',
+                       'Proline']
+loadings = eigen_vecs * np.sqrt(eigen_vals)
+# plt.clf()
+fig, ax = plt.subplots()
+ax.bar(range(13), loadings[:, 0], align='center')
+ax.set_ylabel('Loading for PC 1')
+ax.set_xticks(range(13))
+ax.set_xticklabels(columnslabel, rotation=90)
+plt.ylim([-1, 1])
+plt.tight_layout()
 plt.show()
