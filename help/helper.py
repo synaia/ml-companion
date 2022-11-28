@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 from matplotlib.colors import ListedColormap
 import matplotlib.pyplot as plt
 
@@ -71,3 +72,15 @@ def get_wine_vars():
     X_test_std = stdscaler.transform(X_test)
 
     return X_train, X_test, y_train, y_test, X_train_std, X_test_std
+
+
+def get_wisconsin_data():
+    df = pd.read_csv('../dataset/wdbc.data', header=None)
+
+    X = df.loc[:, 2:].values
+    y = df.loc[:, 1].values
+    le = LabelEncoder()
+    y = le.fit_transform(y)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, stratify=y, random_state=1)
+    return X_train, X_test, y_train, y_test
