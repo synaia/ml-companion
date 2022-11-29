@@ -5,9 +5,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
-from help.helper import get_wisconsin_data
+from help.helper import get_wisconsin_data, get_diabetes_data
 
-X_train, X_test, y_train, y_test = get_wisconsin_data()
+X_train, X_test, y_train, y_test = get_diabetes_data()
+# X_train, X_test, y_train, y_test = get_wisconsin_data()
 
 pipe_svc = make_pipeline(StandardScaler(), SVC(random_state=1))
 param_range = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]

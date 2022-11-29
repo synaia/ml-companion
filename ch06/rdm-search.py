@@ -5,9 +5,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.svm import SVC
 from scipy import stats
-from help.helper import get_wisconsin_data
+from help.helper import get_wisconsin_data, get_diabetes_data
 
-X_train, X_test, y_train, y_test = get_wisconsin_data()
+# X_train, X_test, y_train, y_test = get_wisconsin_data()
+X_train, X_test, y_train, y_test = get_diabetes_data()
 
 pipe_svc = make_pipeline(StandardScaler(), SVC(random_state=1))
 np.random.seed(1)

@@ -84,3 +84,15 @@ def get_wisconsin_data():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, stratify=y, random_state=1)
     return X_train, X_test, y_train, y_test
+
+
+def get_diabetes_data():
+    df = pd.read_csv('../dataset/diabetes.csv', skiprows=[0])
+
+    X = df.iloc[:, :8].values
+    y = df.iloc[:, 8:].values
+    le = LabelEncoder()
+    y = le.fit_transform(y)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, stratify=y, random_state=1)
+    return X_train, X_test, y_train, y_test
