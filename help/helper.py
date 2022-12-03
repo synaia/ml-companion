@@ -74,6 +74,28 @@ def get_wine_vars():
     return X_train, X_test, y_train, y_test, X_train_std, X_test_std
 
 
+def get_wine_boosting_vars():
+    df_wine = pd.read_csv('../dataset/wine.data', header=None)
+    df_wine.columns = ['Class label', 'Alcohol',
+                       'Malic acid', 'Ash',
+                       'Alcalinity od ash', 'Magnesium',
+                       'Total phenols', 'Flavanoids',
+                       'Nonflavanoid phenols',
+                       'Proanthocyamins',
+                       'Color intensity', 'Hue',
+                       'OD280/OD315 of diluted wines',
+                       'Proline']
+    df_wine = df_wine[df_wine['Class label'] != 1]
+    y = df_wine['Class label'].values
+    X = df_wine[['Alcohol', 'OD280/OD315 of diluted wines']].values
+    le = LabelEncoder()
+    y = le.fit_transform(y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, stratify=y)
+
+    return X_train, X_test, y_train, y_test
+
+
+
 def get_wisconsin_data():
     df = pd.read_csv('../dataset/wdbc.data', header=None)
 
