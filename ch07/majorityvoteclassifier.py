@@ -61,7 +61,7 @@ class MajorityVoteClassifier(BaseEstimator, ClassifierMixin):
             return super().get_params(deep=False)
         else:
             out = self.named_classifiers.copy()
-            for name, step in self.classifiers.items():
+            for name, step in self.named_classifiers.items():
                 for key, value in step.get_params(deep=True).items():
                     out[f'{name}__{key}'] = value
             return out

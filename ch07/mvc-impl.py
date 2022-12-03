@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -84,4 +85,20 @@ for idx, clf, tt in zip(product([0, 1], [0, 1]), all_clf, clf_labels):
     axarr[idx[0], idx[1]].set_title(tt)
 plt.text(-3.5, -5.0, s='Sepal width [standardized', ha='center', va='center', fontsize=12)
 plt.text(-12.5, 4.5, s='Sepal length [standardized', ha='center', va='center', fontsize=12, rotation=90)
-plt.show()
+# plt.show()
+
+
+params = {'decisiontreeclassifier__max_depth': [1,  2, 3, 4, 5, 6, 7],
+          'pipeline-1__clf__C': [0.00001, 0.0001, 0.001, 0.1, 1.0, 100.0]}
+grid = GridSearchCV(estimator=mv_clf, param_grid=params, cv=10, scoring='roc_auc')
+grid.fit(X_train, y_train)
+
+print('-'*150)
+for r, _ in enumerate(grid.cv_results_['mean_test_score']):
+    mean_score = grid.cv_results_['mean_test_score'][r]
+    std_dev = grid.cv_results_['std_test_score'][r]
+    params = grid.cv_results_['params'][r]
+    print(f'{mean_score:0.3f} +/- {std_dev:0.3f} {params}')
+
+print(f'\nBest parameters: {grid.best_params_}')
+print(f'ROC AUC : {grid.best_score_:0.2f}')
