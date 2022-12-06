@@ -16,9 +16,5 @@ def tokenizer_porter(text):
     return [porter.stem(word) for word in text.split()]
 
 
-df = pd.read_csv('../dataset/imdb/movie_data.csv', encoding='utf-8')
-df['review'] = df['review'].apply(preprocessor)
-
-
-
-print()
+def tokenizer(text):
+    return text.split()
