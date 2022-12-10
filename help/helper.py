@@ -118,3 +118,17 @@ def get_diabetes_data():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, stratify=y, random_state=1)
     return X_train, X_test, y_train, y_test
+
+
+def lin_reg_plot(X, y, model):
+    plt.scatter(X, y, c='steelblue', edgecolors='white', s=70)
+    plt.plot(X, model.predict(X), color='black', lw=2)
+
+
+def get_housingdata():
+    columns = ['Overall Qual', 'Overall Cond', 'Gr Liv Area', 'Central Air', 'Total Bsmt SF', 'SalePrice']
+    df = pd.read_csv('../dataset/AmesHousing.txt', sep='\t', usecols=columns)
+    df['Central Air'] = df['Central Air'].map({'N': 0, 'Y': 1})
+    df.dropna(axis=0, inplace=True)
+    X, y = df[['Gr Liv Area']].values, df['SalePrice'].values
+    return X, y, df
