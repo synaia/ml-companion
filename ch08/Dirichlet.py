@@ -11,8 +11,8 @@ X_topics = lda.fit_transform(X)
 
 n_top_words = 5
 feature_names = count.get_feature_names_out()
-for topic_idx, topic in enumerate(lda.components_):
-    print(f'Topic {(topic_idx + 1)}')
+for topic_idx, topic in enumerate(lda.components_, 1):
+    print(f'Topic {topic_idx}')
     print(' '.join([feature_names[i] for i in topic.argsort()[:-n_top_words - 1:-1]]))
 
 horror = X_topics[:, 5].argsort()[::-1]

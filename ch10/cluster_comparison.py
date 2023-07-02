@@ -4,9 +4,9 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 
-random_state = 0
+random_state = 42
 
-X, y = make_moons(n_samples=500, noise=0.05, random_state=random_state)
+X, y = make_moons(n_samples=500, noise=0.09, random_state=random_state)
 
 f, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(12, 3))
 km = KMeans(n_clusters=2, random_state=random_state)
