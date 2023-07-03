@@ -1,0 +1,109 @@
+import matplotlib.pyplot as plt
+import torch
+from torch import nn
+from torch.utils.data import DataLoader, TensorDataset
+import numpy as np
+from noisy_linear import NoisyLinear
+
+torch.manual_seed(1)
+np.random.seed(1)
+
+
+class MyNoiseModule(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.l0 = NoisyLinear(2, 4, 0.07)
+        self.a0 = nn.ReLU()
+        self.l1 = nn.Linear(4, 4)
+        self.a1 = nn.ReLU()
+        self.l2 = nn.Linear(4, 4)
+        self.a2 = nn.ReLU()
+        self.l3 = nn.Linear(4, 1)
+        self.a3 = nn.Sigmoid()
+
+    def forward(self, x, training=False):
+        x = self.l0(x, training)
+        x = self.a0(x)
+        x = self.l1(x)
+        x = self.a1(x)
+        x = self.l2(x)
+        x = self.a2(x)
+        x = self.l3(x)
+        x = self.a3(x)
+        return x
+
+    def predict(self, x):
+        x = torch.tensor(x, dtype=torch.float32)
+        pred = self.forward(x)[:, 0]
+        return (pred >= .5).float()
+
+
+model = MyNoiseModule()
+
+x = np.random.uniform(low=-1, high=1, size=(200, 2))
+y = np.ones(len(x))
+y[x[:, 0] * x[:, 1] < 0] = 0
+n_train = 100
+x_train = torch.tensor(x[:n_train, :], dtype=torch.float32)
+y_train = torch.tensor(y[:n_train], dtype=torch.float32)
+x_valid = torch.tensor(x[n_train:, :], dtype=torch.float32)
+y_valid = torch.tensor(y[n_train:], dtype=torch.float32)
+
+# Binary Cross Entropy as a Loss function
+loss_fn = nn.BCELoss()
+# Default Optimizer: Stochastic Gradient Descent
+optimizer = torch.optim.SGD(model.parameters(), lr=0.015)
+
+train_ds = TensorDataset(x_train, y_train)
+batch_size = 2
+torch.manual_seed(1)
+train_dl = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
+
+torch.manual_seed(1)
+num_epochs = 200
+
+
+def train(model, num_epochs, train_dl, x_valid, y_valid):
+    loss_hist_train = [0] * num_epochs
+    accuracy_hist_train = [0] * num_epochs
+    loss_hist_valid = [0] * num_epochs
+    accuracy_hist_valid = [0] * num_epochs
+
+    for epoch in range(num_epochs):
+        for x_batch, y_batch in train_dl:
+            pred = model(x_batch, training=True)[:, 0] # SelectBackward0
+            loss = loss_fn(pred, y_batch)
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+            loss_hist_train[epoch] += loss.item()
+            is_correct = ((pred >= 0.5).float() == y_batch).float()
+            accuracy_hist_train[epoch] += is_correct.mean()
+        loss_hist_train[epoch] /= n_train/batch_size
+        accuracy_hist_train[epoch] /= n_train/batch_size
+        pred = model(x_valid)[:, 0]
+        loss = loss_fn(pred, y_valid)
+        loss_hist_valid[epoch] = loss.item()
+        is_correct = ((pred >= 0.5).float() == y_valid).float()
+        accuracy_hist_valid[epoch] += is_correct.mean()
+
+    return loss_hist_train, loss_hist_valid, accuracy_hist_train, accuracy_hist_valid
+
+
+history = train(model, num_epochs, train_dl, x_valid, y_valid)
+
+
+fig = plt.figure(figsize=(16, 4))
+ax = fig.add_subplot(1, 2, 1)
+plt.plot(history[0], lw=4)
+plt.plot(history[1], lw=4)
+plt.legend(['Train loss', 'Validation loss'], fontsize=15)
+ax.set_label('Epochs')
+ax = fig.add_subplot(1, 2, 2)
+plt.plot(history[2], lw=4)
+plt.plot(history[3], lw=4)
+plt.legend(['Train Acc.', 'Validacion Acc.'], fontsize=15)
+ax.set_label('Epochs')
+plt.show()
+
+
