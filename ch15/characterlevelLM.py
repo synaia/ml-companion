@@ -196,8 +196,8 @@ loss = checkpoint['loss']
 model.to(mps_device)
 
 # Experiment:
-print('\n\nExperiment whit mps\n')
+# print('\n\nExperiment whit mps\n')
 torch.manual_seed(1)
 # print(sample(model, starting_str='The island had', in_device=mps_device))
-# print(sample(model, starting_str='Captain Grant said', in_device=mps_device))
+
 

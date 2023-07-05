@@ -14,7 +14,8 @@ mps_device = torch.device("mps")
 model.to(mps_device)
 
 # Experiment:
-print('\n\nExperiment whit mps\n')
+print('\n\n\n\n\nPerforming next-character prediction and sampling (using mps-gpu device)\n')
 torch.manual_seed(1)
 print(sample(model, starting_str='The island had', in_device=mps_device))
 # print(sample(model, starting_str='Captain Grant said', in_device=mps_device))
+print('\n\n\n\n\n\n\n\n\n')
