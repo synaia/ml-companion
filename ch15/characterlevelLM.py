@@ -75,13 +75,13 @@ class RNN(nn.Module):
         self.rnn_hidden_size = rnn_hidden_size
         self.rnn = nn.LSTM(embed_dim, rnn_hidden_size, batch_first=True)
         self.fc = nn.Linear(rnn_hidden_size, vocab_size)
-        # self.logsoftmax = nn.LogSoftmax(1)
+        self.logsoftmax = nn.LogSoftmax(dim=1)
 
     def forward(self, x, hidden, cell):
         out = self.embedding(x).unsqueeze(1)
         out, (hidden, cell) = self.rnn(out, (hidden, cell))
         out = self.fc(out).reshape(out.size(0), -1)
-        # out = self.logsoftmax(x)
+        out = self.logsoftmax(out)
         return out, hidden, cell
 
     def init_hidden(self, batch_size):
@@ -151,13 +151,13 @@ save_best = SaveBestModel()
 # Evaluation #
 from torch.distributions.categorical import Categorical
 
-
+## scale_factor opposited to "temperature"; increasing temperature -> more random generation
 def sample(model: RNN, starting_str, len_generated_text=500, scale_factor=1., in_device=None):
     encoded_input = torch.tensor(
         [char2int[s] for s in starting_str],
         device=in_device
     )
-    encoded_input = torch.reshape(
+    encoded_input = torch.reshape(  # from [] -- to --> [[]]
         encoded_input, (1, -1),
     )
     generated_str = starting_str
@@ -166,21 +166,25 @@ def sample(model: RNN, starting_str, len_generated_text=500, scale_factor=1., in
     hidden, cell = model.init_hidden(1)
     hidden.to(in_device)
     cell.to(in_device)
+    # This is the "context string"; the model know the first part without the end character ....
     for c in range(len(starting_str) - 1):
-        _, hidden, cell = model( # check this
+        # ignore _ logits
+        _, hidden, cell = model(
             encoded_input[:, c].view(1), hidden, cell
         )
 
-    last_char = encoded_input[:, -1]
+    last_encoded_char = encoded_input[:, -1]
     for i in range(len_generated_text):
         logits, hidden, cell = model(
-            last_char.view(1), hidden, cell
+            last_encoded_char.view(1), hidden, cell
         )
-        logits = torch.squeeze(logits, 0) # wtf?
+        logits = torch.squeeze(logits, 0) # from [[]] -- to -->  []
         scaled_logits = logits * scale_factor
         m = Categorical(logits=scaled_logits)
-        last_char = m.sample()
-        generated_str += str(char_array[last_char])
+        last_encoded_char = m.sample() # the predicted next char;
+                                       # return the index logits with the max probability from a vector [80] indxs
+                                       # we can use softmax to reescale in range [0,1] and sum 1, to represent better probabilities.
+        generated_str += str(char_array[last_encoded_char])
 
     return generated_str
 

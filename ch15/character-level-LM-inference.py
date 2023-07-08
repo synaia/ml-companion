@@ -16,6 +16,9 @@ model.to(mps_device)
 # Experiment:
 print('\n\n\n\n\nPerforming next-character prediction and sampling (using mps-gpu device)\n')
 torch.manual_seed(1)
-print(sample(model, starting_str='The island had', in_device=mps_device))
-# print(sample(model, starting_str='Captain Grant said', in_device=mps_device))
-print('\n\n\n\n\n\n\n\n\n')
+input_text = 'The island had'
+print(f'Starting string: "{input_text} ..."\n')
+print("New text generate from model:")
+print(sample(model, starting_str=input_text, in_device=mps_device, scale_factor=1.5))
+# print(sample(model, starting_str='Navigating the sea', in_device=mps_device, scale_factor=0.5))
+print('\n')
